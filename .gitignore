@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+venv/
+env/
+*.egg-info/
+
+# Data (datasets are usually too large/shouldn't be public)
+data/raw/*
+!data/raw/.gitkeep
+
+# Models (trained model files, once we get there)
+models/*.pkl
+models/*.pt
+models/*.bin
+
+# Environment / secrets
+.env
+
+# OS/editor junk
+.DS_Store
+.vscode/
+.idea/
