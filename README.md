@@ -24,22 +24,25 @@ This project builds a small end-to-end system — similar in shape to what a rea
 ---
 
 ## 🏗️ Pipeline Architecture
+
+```
 📥 Raw comment
-│
-▼
-1️⃣ Language ID (per-word: Sinhala / Tamil / English)
-│
-▼
-2️⃣ Preprocessing
-│
-▼
-3️⃣ Classification (offensive / clean)
-│
-▼
-4️⃣ Explainability (which words triggered the flag)
-│
-▼
-5️⃣ REST API → 📊 Dashboard
+     │
+     ▼
+1️⃣  Language ID          (per-word: Sinhala / Tamil / English)
+     │
+     ▼
+2️⃣  Preprocessing
+     │
+     ▼
+3️⃣  Classification        (offensive / clean)
+     │
+     ▼
+4️⃣  Explainability        (which words triggered the flag)
+     │
+     ▼
+5️⃣  REST API  →  📊 Dashboard
+```
 
 
 ---
