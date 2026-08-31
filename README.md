@@ -7,7 +7,6 @@
 
 An NLP pipeline for detecting offensive content in **Sinhala-Tamil-English code-mixed social media text** — the way people actually write online in Sri Lanka, mixing languages within the same sentence.
 
-> 🚧 **Work in progress** — built step-by-step as a learning-driven portfolio project. Progress tracked below.
 
 ---
 
@@ -52,7 +51,7 @@ This project builds a small end-to-end system — similar in shape to what a rea
 | Step | Description | Status |
 |------|-------------|--------|
 | 1 | Language Identification (character-trigram model) | ✅ Done |
-| 2 | Text preprocessing & feature extraction | ⬜ Planned |
+| 2 | Text preprocessing & feature extraction | ✅ Done  |
 | 3 | Classification model (classical ML → transformer) | ⬜ Planned |
 | 4 | Evaluation (precision/recall/F1, confusion matrix) | ⬜ Planned |
 | 5 | Explainability (LIME/SHAP) | ⬜ Planned |
