@@ -7,7 +7,6 @@
 
 An NLP pipeline for detecting offensive content in **Sinhala-Tamil-English code-mixed social media text** — the way people actually write online in Sri Lanka, mixing languages within the same sentence.
 
-
 ---
 
 ## 💡 Why this project?
@@ -44,6 +43,7 @@ This project builds a small end-to-end system — similar in shape to what a rea
 ```
 
 
+
 ---
 
 ## 🗺️ Roadmap
@@ -51,8 +51,8 @@ This project builds a small end-to-end system — similar in shape to what a rea
 | Step | Description | Status |
 |------|-------------|--------|
 | 1 | Language Identification (character-trigram model) | ✅ Done |
-| 2 | Text preprocessing & feature extraction | ✅ Done  |
-| 3 | Classification model (classical ML → transformer) | ⬜ Planned |
+| 2 | Text preprocessing & feature extraction | ✅ Done |
+| 3 | Classification model (Naive Bayes baseline on real data) | ✅ Done |
 | 4 | Evaluation (precision/recall/F1, confusion matrix) | ⬜ Planned |
 | 5 | Explainability (LIME/SHAP) | ⬜ Planned |
 | 6 | REST API (FastAPI) | ⬜ Planned |
@@ -77,10 +77,36 @@ result = identifier.predict_sentence("mama office ta yanawa traffic ekak")
 
 ---
 
-## 📊 Datasets (planned for later steps)
+## ✅ Steps 2 & 3: Feature Extraction & Classification
 
-- **[NLPC-UOM Sinhala-English Code-Mixed Dataset](https://huggingface.co/)** — 10,000 manually annotated comments (sentiment, humor, hate speech, language ID)
-- **[DravidianCodeMix](https://aclanthology.org/)** — ~44,000 Tamil-English annotated YouTube comments (offensive language)
+Comments are converted to numeric TF-IDF vectors, then classified as `offensive` / `clean` using a Naive Bayes model trained on the real dataset (10,814 training comments).
+
+```python
+from src.classification.data_loader import load_hate_speech_data, split_data
+from src.classification.classifier import OffensiveTextClassifier
+
+comments, labels = load_hate_speech_data("data/raw/sentence-level-annotation.csv")
+train_comments, test_comments, train_labels, test_labels = split_data(comments, labels)
+
+classifier = OffensiveTextClassifier()
+classifier.train(train_comments, train_labels)
+
+label, probs = classifier.predict("some comment here")
+```
+
+**Note:** current results are unevaluated on the full test set — proper precision/recall/F1 evaluation is Step 4 (in progress). Given the dataset's class imbalance (~91% clean / 9% offensive), accuracy alone won't be a reliable metric here.
+
+---
+
+## 📊 Dataset
+
+Using the **[NLPC-UOM Sinhala-English Code-Mixed Dataset](https://huggingface.co/datasets/NLPC-UOM/Sinhala-English-Code-Mixed-Code-Switched-Dataset)** — 13,518 sentence-level annotated comments, originally labeled for sentiment, humor, and hate speech.
+
+For this project, the 3-way hate speech label (`Not offensive` / `Abusive` / `Hate-Inducing`) is simplified into a binary `clean` / `offensive` label.
+
+> ⚠️ Not included in this repo (see `.gitignore`) — download `sentence-level-annotation.csv` from the link above and place it in `data/raw/` to reproduce results.
+
+**Planned for Tamil support:** [DravidianCodeMix](https://aclanthology.org/) — ~44,000 Tamil-English annotated YouTube comments (future work, see roadmap).
 
 ---
 
@@ -97,14 +123,14 @@ python3 test_run.py
 
 ## 🛠️ Tech Stack
 
-**Current:** Python
-**Planned:** scikit-learn · Transformers (XLM-RoBERTa) · SHAP · FastAPI · Streamlit/Plotly
+**Current:** Python · pandas · scikit-learn (TF-IDF, Naive Bayes)
+**Planned:** Transformers (XLM-RoBERTa) · SHAP · FastAPI · Streamlit/Plotly
 
 ---
 
 ## 👤 Author
 
-**Poorni Gimasha Pathirage** 
+**Poorni Gimasha Pathirage**
 
 🔗 [LinkedIn](https://www.linkedin.com/in/poornipathirage/) · [GitHub](https://github.com/poorniGimasha2003)
 
