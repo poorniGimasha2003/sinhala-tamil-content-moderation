@@ -53,7 +53,7 @@ This project builds a small end-to-end system — similar in shape to what a rea
 | 1 | Language Identification (character-trigram model) | ✅ Done |
 | 2 | Text preprocessing & feature extraction | ✅ Done |
 | 3 | Classification model (Naive Bayes baseline on real data) | ✅ Done |
-| 4 | Evaluation (precision/recall/F1, confusion matrix) | ⬜ Planned |
+| 4 | Evaluation (precision/recall/F1, confusion matrix) | ✅ Done |
 | 5 | Explainability (LIME/SHAP) | ⬜ Planned |
 | 6 | REST API (FastAPI) | ⬜ Planned |
 | 7 | Monitoring dashboard (visualizations) | ⬜ Planned |
@@ -98,6 +98,19 @@ label, probs = classifier.predict("some comment here")
 
 ---
 
+## ✅ Step 4: Evaluation & Class Imbalance Fix
+
+The dataset is heavily imbalanced (~91% clean / 9% offensive). An initial model trained without addressing this achieved 91% accuracy — but a closer look revealed it was catching only **1% of actual offensive comments** (recall = 0.01), simply defaulting to "clean" almost every time.
+
+**Fix:** applied class-balanced sample weighting during training, forcing the model to actually learn from the minority (offensive) class.
+
+| Metric (offensive class) | Before balancing | After balancing |
+|---|---|---|
+| Precision | 1.00 | 0.23 |
+| Recall | 0.01 | 0.81 |
+| F1-score | 0.02 | 0.36 |
+
+**Takeaway:** overall accuracy dropped (91% → 74%), but this reflects a real tradeoff — the balanced model now catches 81% of offensive content instead of 1%, at the cost of more false positives. For a moderation system, missing real offensive content is the costlier failure, so this tradeoff is the right one.
 ## 📊 Dataset
 
 Using the **[NLPC-UOM Sinhala-English Code-Mixed Dataset](https://huggingface.co/datasets/NLPC-UOM/Sinhala-English-Code-Mixed-Code-Switched-Dataset)** — 13,518 sentence-level annotated comments, originally labeled for sentiment, humor, and hate speech.
