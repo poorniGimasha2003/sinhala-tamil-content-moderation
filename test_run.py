@@ -121,3 +121,16 @@ predictions = evaluate_classifier(balanced_classifier, test_comments, test_label
 #
 # print("\n--- Transformer Evaluation ---")
 # print(classification_report(small_test_labels, transformer_predictions))
+
+# --- Step 5: Explainability ---
+from src.explainability.explain import explain_prediction
+
+print("\n--- Explainability ---")
+test_comment = "you are so stupid"
+label, probs = balanced_classifier.predict(test_comment)
+top_words = explain_prediction(balanced_classifier, test_comment)
+
+print(f"Comment: '{test_comment}' -> {label}")
+print("Top contributing words:")
+for word, score in top_words:
+    print(f"  {word}: {score:.3f}")
