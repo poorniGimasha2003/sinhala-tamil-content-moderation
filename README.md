@@ -1,6 +1,6 @@
 # 🇱🇰 Code-Mixed Content Moderation Pipeline
 
-![Status](https://img.shields.io/badge/status-in%20progress-yellow)
+![Status](https://img.shields.io/badge/status-complete-brightgreen)
 ![Python](https://img.shields.io/badge/python-3.9%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![NLP](https://img.shields.io/badge/NLP-code--mixed%20text-orange)
@@ -46,6 +46,9 @@ This project builds a small end-to-end system — similar in shape to what a rea
 
 ---
 
+
+---
+
 ## 🗺️ Roadmap
 
 | Step | Description | Status |
@@ -55,8 +58,8 @@ This project builds a small end-to-end system — similar in shape to what a rea
 | 3 | Classification model (Naive Bayes baseline; transformer attempted) | ✅ Done |
 | 4 | Evaluation (precision/recall/F1, confusion matrix) | ✅ Done |
 | 5 | Explainability (word-level Naive Bayes scores) | ✅ Done |
-| 6 | REST API (FastAPI) | ⬜ Planned |
-| 7 | Monitoring dashboard (visualizations) | ⬜ Planned |
+| 6 | REST API (FastAPI) | ✅ Done |
+| 7 | Monitoring dashboard (Streamlit + Plotly) | ✅ Done |
 
 ---
 
@@ -94,8 +97,8 @@ classifier.train(train_comments, train_labels)
 label, probs = classifier.predict("some comment here")
 ```
 
-**Note:** current results are unevaluated on the full test set — proper precision/recall/F1 evaluation is Step 4 (in progress). Given the dataset's class imbalance (~91% clean / 9% offensive), accuracy alone won't be a reliable metric here.
 **Transformer comparison (attempted):** fine-tuned XLM-RoBERTa was tested but revealed the same class-imbalance failure mode as the unbalanced Naive Bayes baseline (0% recall on the offensive class) — confirming the imbalance issue is a property of the dataset, not the model. Class-weighted transformer training is noted as future work (`src/classification/transformer_classifier.py`).
+
 ---
 
 ## ✅ Step 4: Evaluation & Class Imbalance Fix
@@ -128,6 +131,38 @@ top_words = explain_prediction(balanced_classifier, "you are so stupid")
 
 **Known limitation:** this word-level view uses raw log-probabilities and doesn't account for TF-IDF weighting or the model's class prior — so it can diverge from the model's actual final decision (a genuine tradeoff of this lightweight approach vs. full tools like SHAP/LIME, noted as future work).
 
+---
+
+## ✅ Step 6: REST API
+
+A FastAPI service exposes the full pipeline (classification + explainability) over HTTP.
+
+```bash
+python3 -m uvicorn src.api.main:app --reload
+```
+
+Then visit `http://127.0.0.1:8000/docs` for interactive API testing, or:
+
+```bash
+curl -X POST 'http://127.0.0.1:8000/moderate' \
+  -H 'Content-Type: application/json' \
+  -d '{"text": "you are so stupid"}'
+```
+
+Returns the prediction, class probabilities, and top contributing words in one response.
+
+---
+
+## ✅ Step 7: Dashboard
+
+An interactive Streamlit dashboard demonstrates the full pipeline: live comment moderation with explainability, and a visualization of the dataset's class imbalance.
+
+```bash
+python3 -m streamlit run dashboard/app.py
+```
+
+---
+
 ## 📊 Dataset
 
 Using the **[NLPC-UOM Sinhala-English Code-Mixed Dataset](https://huggingface.co/datasets/NLPC-UOM/Sinhala-English-Code-Mixed-Code-Switched-Dataset)** — 13,518 sentence-level annotated comments, originally labeled for sentiment, humor, and hate speech.
@@ -153,8 +188,17 @@ python3 test_run.py
 
 ## 🛠️ Tech Stack
 
-**Current:** Python · pandas · scikit-learn (TF-IDF, Naive Bayes)
-**Planned:** Transformers (XLM-RoBERTa) · SHAP · FastAPI · Streamlit/Plotly
+Python · pandas · scikit-learn (TF-IDF, Naive Bayes) · Transformers (XLM-RoBERTa) · FastAPI · Streamlit · Plotly
+
+---
+
+## 🔬 Limitations & Future Work
+
+- **Class imbalance**: dataset is ~91% clean / 9% offensive. Addressed via class-weighted training (recall improved 0.01 → 0.81), but longer sentences with few strong signal words can still be misclassified due to dilution by common words.
+- **Out-of-vocabulary words**: words not seen during training default to a 50/50 prediction with no explanation — a larger training set would reduce this.
+- **Explainability accuracy**: the word-level explanation view uses raw log-probabilities and can diverge from the model's actual TF-IDF-weighted decision — a known tradeoff of this lightweight approach vs. full SHAP/LIME tooling.
+- **Transformer upgrade**: XLM-RoBERTa fine-tuning was attempted but requires class-weighted training (not yet implemented) to be a fair comparison — noted as the clearest next step.
+- **Tamil support**: language ID supports Tamil, but the classifier was only trained on the Sinhala-English dataset. DravidianCodeMix (Tamil-English) is identified as the dataset for extending this.
 
 ---
 
