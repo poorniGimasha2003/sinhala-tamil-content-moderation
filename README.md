@@ -54,7 +54,7 @@ This project builds a small end-to-end system — similar in shape to what a rea
 | 2 | Text preprocessing & feature extraction | ✅ Done |
 | 3 | Classification model (Naive Bayes baseline; transformer attempted) | ✅ Done |
 | 4 | Evaluation (precision/recall/F1, confusion matrix) | ✅ Done |
-| 5 | Explainability (LIME/SHAP) | ⬜ Planned |
+| 5 | Explainability (word-level Naive Bayes scores) | ✅ Done |
 | 6 | REST API (FastAPI) | ⬜ Planned |
 | 7 | Monitoring dashboard (visualizations) | ⬜ Planned |
 
@@ -111,6 +111,23 @@ The dataset is heavily imbalanced (~91% clean / 9% offensive). An initial model 
 | F1-score | 0.02 | 0.36 |
 
 **Takeaway:** overall accuracy dropped (91% → 74%), but this reflects a real tradeoff — the balanced model now catches 81% of offensive content instead of 1%, at the cost of more false positives. For a moderation system, missing real offensive content is the costlier failure, so this tradeoff is the right one.
+
+---
+
+## ✅ Step 5: Explainability
+
+For each prediction, the top contributing words are surfaced by comparing each word's log-probability under `offensive` vs `clean` — directly readable from the trained Naive Bayes model's internal probabilities.
+
+```python
+from src.explainability.explain import explain_prediction
+
+label, probs = balanced_classifier.predict("you are so stupid")
+top_words = explain_prediction(balanced_classifier, "you are so stupid")
+# [('stupid', 1.667), ('you', -0.721), ('are', -0.767), ('so', -1.271)]
+```
+
+**Known limitation:** this word-level view uses raw log-probabilities and doesn't account for TF-IDF weighting or the model's class prior — so it can diverge from the model's actual final decision (a genuine tradeoff of this lightweight approach vs. full tools like SHAP/LIME, noted as future work).
+
 ## 📊 Dataset
 
 Using the **[NLPC-UOM Sinhala-English Code-Mixed Dataset](https://huggingface.co/datasets/NLPC-UOM/Sinhala-English-Code-Mixed-Code-Switched-Dataset)** — 13,518 sentence-level annotated comments, originally labeled for sentiment, humor, and hate speech.
