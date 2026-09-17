@@ -83,12 +83,41 @@ for comment, true_label in zip(test_comments[:5], test_labels[:5]):
     print(f"Comment: {comment}")
     print(f"  True: {true_label} | Predicted: {predicted_label} | Probabilities: {probs}\n")
 
-    from src.classification.evaluation import evaluate_classifier
+from src.classification.evaluation import evaluate_classifier
 
 predictions = evaluate_classifier(real_classifier, test_comments, test_labels)
 
+# --- Step 4: Balanced classifier (this is our production model going forward) ---
 balanced_classifier = OffensiveTextClassifier()
-balanced_classifier.train(train_comments, train_labels)  # balancing is now on by default
+balanced_classifier.train(train_comments, train_labels)  # balancing is on by default
 
 print("\n--- Evaluation WITH class balancing ---")
 predictions = evaluate_classifier(balanced_classifier, test_comments, test_labels)
+
+
+# --- Transformer comparison (PAUSED — see README for findings) ---
+# Fine-tuned XLM-RoBERTa was tested but showed the same class-imbalance
+# failure as the unbalanced Naive Bayes baseline (0% recall on offensive).
+# Needs class-weighted training to be a fair comparison — noted as future work.
+#
+# from src.classification.transformer_classifier import train_transformer_classifier
+#
+# subset_size = 2000
+# small_train_comments = train_comments[:subset_size]
+# small_train_labels = train_labels[:subset_size]
+# small_test_comments = test_comments[:500]
+# small_test_labels = test_labels[:500]
+#
+# print("\n--- Fine-tuning XLM-RoBERTa (this will take a while) ---")
+# trainer, tokenizer = train_transformer_classifier(
+#     small_train_comments, small_train_labels,
+#     small_test_comments, small_test_labels
+# )
+#
+# from src.classification.transformer_classifier import predict_with_transformer
+# from sklearn.metrics import classification_report
+#
+# transformer_predictions = predict_with_transformer(trainer, tokenizer, small_test_comments)
+#
+# print("\n--- Transformer Evaluation ---")
+# print(classification_report(small_test_labels, transformer_predictions))
