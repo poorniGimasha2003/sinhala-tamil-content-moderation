@@ -1,3 +1,6 @@
 pytest
 scikit-learn
 pandas
+transformers
+torch
+datasets

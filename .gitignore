@@ -22,3 +22,6 @@ models/*.bin
 .DS_Store
 .vscode/
 .idea/
+
+# Model checkpoints (large files)
+models/
