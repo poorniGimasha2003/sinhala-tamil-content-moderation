@@ -82,3 +82,13 @@ for comment, true_label in zip(test_comments[:5], test_labels[:5]):
     predicted_label, probs = real_classifier.predict(comment)
     print(f"Comment: {comment}")
     print(f"  True: {true_label} | Predicted: {predicted_label} | Probabilities: {probs}\n")
+
+    from src.classification.evaluation import evaluate_classifier
+
+predictions = evaluate_classifier(real_classifier, test_comments, test_labels)
+
+balanced_classifier = OffensiveTextClassifier()
+balanced_classifier.train(train_comments, train_labels)  # balancing is now on by default
+
+print("\n--- Evaluation WITH class balancing ---")
+predictions = evaluate_classifier(balanced_classifier, test_comments, test_labels)
