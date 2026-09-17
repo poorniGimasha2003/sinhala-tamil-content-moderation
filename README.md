@@ -52,7 +52,7 @@ This project builds a small end-to-end system — similar in shape to what a rea
 |------|-------------|--------|
 | 1 | Language Identification (character-trigram model) | ✅ Done |
 | 2 | Text preprocessing & feature extraction | ✅ Done |
-| 3 | Classification model (Naive Bayes baseline on real data) | ✅ Done |
+| 3 | Classification model (Naive Bayes baseline; transformer attempted) | ✅ Done |
 | 4 | Evaluation (precision/recall/F1, confusion matrix) | ✅ Done |
 | 5 | Explainability (LIME/SHAP) | ⬜ Planned |
 | 6 | REST API (FastAPI) | ⬜ Planned |
@@ -95,7 +95,7 @@ label, probs = classifier.predict("some comment here")
 ```
 
 **Note:** current results are unevaluated on the full test set — proper precision/recall/F1 evaluation is Step 4 (in progress). Given the dataset's class imbalance (~91% clean / 9% offensive), accuracy alone won't be a reliable metric here.
-
+**Transformer comparison (attempted):** fine-tuned XLM-RoBERTa was tested but revealed the same class-imbalance failure mode as the unbalanced Naive Bayes baseline (0% recall on the offensive class) — confirming the imbalance issue is a property of the dataset, not the model. Class-weighted transformer training is noted as future work (`src/classification/transformer_classifier.py`).
 ---
 
 ## ✅ Step 4: Evaluation & Class Imbalance Fix
